@@ -5,7 +5,7 @@ APP = App.new do
     "this is the root"
   end
 
-  get 'users/:username' do
+  get '/users/:username' do
     'this is the user'
   end
 end
