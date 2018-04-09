@@ -3,8 +3,15 @@ class App
     @routes = RouteTable.new(block)
   end
 
+  # env has rack stuff, http headers, etc
+  # rack request has more convenient naming
   def call(env)
-    [200, {}, ["200 OK", "Hash of HTTP headers", "Enumerable of stringable objects such as 'Hello World!'"]]
+    request = Rack::Request.new(env)
+    @routes.each do |route|
+      content = route.match(request)
+      return [200, {}, [content]] if content
+    end
+    [404, {}, ["not found oh no"]]
   end
 
   class RouteTable
@@ -15,10 +22,20 @@ class App
 
     def get(route_spec, &block)
       @routes << Route.new(route_spec, block)
-      p @routes
+    end
+
+    def each(&block)
+      @routes.each(&block)
     end
   end
 
   class Route < Struct.new(:route_spec, :block)
+    def match(request)
+      if request.path == route_spec
+        "all good"
+      else
+        nil
+      end
+    end
   end
 end
