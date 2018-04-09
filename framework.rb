@@ -32,7 +32,7 @@ class App
   class Route < Struct.new(:route_spec, :block)
     def match(request)
       if request.path == route_spec
-        "all good"
+        block.call
       else
         nil
       end
